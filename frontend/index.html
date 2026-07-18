@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberShield - AI Red-Teaming Dashboard</title>
+    
+    <!-- Google Fonts: Cormorant Garamond (Headings) and DM Sans (Body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Custom Style Sheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Top Disclaimer Banner -->
+    <div id="disclaimer-banner" class="disclaimer-banner">
+        <div class="banner-content">
+            <span class="banner-icon">🤖</span>
+            <span class="banner-text">Demo Mode — VigilAI Prototype. This is a hackathon proof-of-concept, not our production build. Full development begins once we move beyond the hackathon stage.</span>
+        </div>
+        <button id="close-banner-btn" class="close-banner-btn" aria-label="Close banner" onclick="var b=document.getElementById('disclaimer-banner'); if(b) b.style.display='none';">&times;</button>
+    </div>
+    <div class="glow-bg"></div>
+    <div class="container">
+        <!-- Header Section -->
+        <header class="dashboard-header">
+            <div class="header-left">
+                <h1 class="logo-text">CyberShield</h1>
+                <p class="tagline">AI Red-Teaming & Prompt Injection Vulnerability Scanner</p>
+            </div>
+            <div class="header-right">
+                <button id="run-scan-btn" class="gold-btn">
+                    <span class="btn-glow"></span>
+                    <span class="btn-text">Run Security Scan</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Summary Cards Row -->
+        <section class="summary-section">
+            <div class="card summary-card" id="card-total">
+                <div class="card-icon">⚡</div>
+                <div class="card-content">
+                    <h3>Total Attacks Run</h3>
+                    <p class="stat-val" id="stat-total">-</p>
+                </div>
+            </div>
+            <div class="card summary-card" id="card-pass-rate">
+                <div class="card-icon">🛡️</div>
+                <div class="card-content">
+                    <h3>Pass Rate</h3>
+                    <p class="stat-val" id="stat-pass-rate">-%</p>
+                </div>
+            </div>
+            <div class="card summary-card" id="card-severity">
+                <div class="card-icon">⚠️</div>
+                <div class="card-content">
+                    <h3>Overall Severity</h3>
+                    <p class="stat-val severity-badge" id="stat-severity">-</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Charts and Breakdown Section -->
+        <section class="visuals-section">
+            <div class="card chart-card">
+                <div class="card-header">
+                    <h2>Vulnerability Breakdown by Category</h2>
+                    <p class="card-subtitle">Failures detected per prompt injection category</p>
+                </div>
+                <div class="chart-container">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Results Table Section -->
+        <section class="results-section">
+            <div class="card table-card">
+                <div class="card-header">
+                    <h2>Scan Results</h2>
+                    <p class="card-subtitle">Detailed log of evaluated prompt injection payloads</p>
+                </div>
+                <div class="table-wrapper">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th width="10%">ID</th>
+                                <th width="20%">Category</th>
+                                <th width="35%">Payload</th>
+                                <th width="15%">Verdict</th>
+                                <th width="20%">Reason</th>
+                            </tr>
+                        </thead>
+                        <tbody id="scan-results-body">
+                            <tr>
+                                <td colspan="5" class="loading-state">
+                                    <div class="spinner"></div>
+                                    <span>Waiting for scan to run...</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Script File -->
+    <script src="script.js"></script>
+</body>
+</html>
