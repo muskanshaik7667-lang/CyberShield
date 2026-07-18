@@ -27,7 +27,7 @@ def chat():
     }
     last_resp = None
     for api_key in api_keys:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key={api_key}"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key={api_key}"
         resp = requests.post(url, headers={"content-type": "application/json"}, json=payload)
         last_resp = resp
         if resp.status_code == 200:

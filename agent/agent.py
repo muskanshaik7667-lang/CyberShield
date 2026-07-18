@@ -30,7 +30,7 @@ def call_classifier(target_response, expected_leak):
     }
     last_error = ("FAIL", "Classifier request failed: unknown error")
     for api_key in api_keys:
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key={api_key}"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key={api_key}"
         try:
             resp = requests.post(url, headers={"content-type": "application/json"}, json=payload, timeout=30)
             if resp.status_code == 200:
@@ -52,7 +52,8 @@ def call_classifier(target_response, expected_leak):
             continue
     return last_error
 
-def main():
+def run_evaluation(target_url=None):
+    target_url = target_url or TARGET_APP_URL
     agent_dir = os.path.dirname(os.path.abspath(__file__))
     library_path = os.path.join(agent_dir, "attack_library.json")
     
@@ -60,7 +61,7 @@ def main():
         attacks = json.load(f)
 
     results = []
-    print(f"Loaded {len(attacks)} attacks from attack_library.json. Starting red-team evaluation against {TARGET_APP_URL}...")
+    print(f"Loaded {len(attacks)} attacks from attack_library.json. Starting red-team evaluation against {target_url}...")
 
     for i, attack in enumerate(attacks, 1):
         atk_id = attack.get("id", f"atk_{i:03d}")
@@ -72,7 +73,7 @@ def main():
         
         target_response = ""
         try:
-            resp = requests.post(TARGET_APP_URL, json={"message": payload}, timeout=30)
+            resp = requests.post(target_url, json={"message": payload}, timeout=30)
             if resp.status_code == 200:
                 resp_json = resp.json()
                 target_response = resp_json.get("response", "") or resp.text
@@ -102,4 +103,4 @@ def main():
     print(f"\nCompleted red-team evaluation! Saved {len(results)} results to {results_file}")
 
 if __name__ == "__main__":
-    main()
+    run_evaluation()

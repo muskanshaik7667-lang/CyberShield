@@ -16,21 +16,57 @@ document.addEventListener('DOMContentLoaded', () => {
     const scanBtn = document.getElementById('run-scan-btn');
     if (scanBtn) {
         scanBtn.addEventListener('click', () => {
-            fetchResults();
+            runSecurityScan();
         });
     }
 
     fetchResults();
 });
 
+async function runSecurityScan() {
+    const tbody = document.getElementById('scan-results-body');
+    if (tbody) {
+        tbody.innerHTML = '<tr><td colspan="5" class="loading-state"><div class="spinner"></div><span>Running scan against target... This may take 1-2 minutes...</span></td></tr>';
+    }
+
+    const targetUrl = document.getElementById('target-url-input')?.value.trim();
+    const payload = {};
+    if (targetUrl) {
+        payload.target_url = targetUrl;
+    }
+
+    try {
+        const resp = await fetch('http://localhost:5001/scan', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+        
+        if (resp.ok) {
+            const data = await resp.json();
+            if (Array.isArray(data)) {
+                renderTable(data);
+                updateSummary(data);
+            }
+        } else {
+            if (tbody) tbody.innerHTML = `<tr><td colspan="5" class="loading-state" style="color: var(--danger);">Error running scan: HTTP ${resp.status}</td></tr>`;
+        }
+    } catch (e) {
+        console.log('Error running scan', e);
+        if (tbody) tbody.innerHTML = `<tr><td colspan="5" class="loading-state" style="color: var(--danger);">Network error running scan. See console.</td></tr>`;
+    }
+}
+
 async function fetchResults() {
     try {
         const resp = await fetch('http://localhost:5001/scan');
         if (resp.ok) {
             const data = await resp.json();
-            if (data && data.results) {
-                renderTable(data.results);
-                updateSummary(data.results);
+            if (Array.isArray(data)) {
+                renderTable(data);
+                updateSummary(data);
             }
         }
     } catch (e) {
@@ -44,11 +80,12 @@ function renderTable(results) {
     tbody.innerHTML = '';
     results.forEach(item => {
         const tr = document.createElement('tr');
+        const v = (item.verdict || '').toLowerCase();
         tr.innerHTML = `
             <td>${item.id || ''}</td>
             <td>${item.category || ''}</td>
             <td class="payload-cell"><span class="payload-text">${item.payload || ''}</span></td>
-            <td><span class="badge ${item.verdict === 'PASS' ? 'badge-pass' : 'badge-fail'}">${item.verdict || ''}</span></td>
+            <td><span class="badge ${v === 'pass' ? 'badge-pass' : 'badge-fail'}">${item.verdict || ''}</span></td>
             <td>${item.reason || ''}</td>
         `;
         tbody.appendChild(tr);
@@ -62,7 +99,7 @@ function updateSummary(results) {
     if (!totalEl || !passRateEl || !severityEl) return;
 
     const total = results.length;
-    const passes = results.filter(r => r.verdict === 'PASS').length;
+    const passes = results.filter(r => (r.verdict || '').toLowerCase() === 'pass').length;
     const passRate = total > 0 ? Math.round((passes / total) * 100) : 0;
 
     totalEl.textContent = total;
