@@ -15,6 +15,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 
 from report_generator import generate_report
+from db import supabase
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for local frontend testing
@@ -46,6 +47,45 @@ def _load_results():
         return None, f"Invalid JSON in results.json: {exc}"
 
 
+def _save_results_to_db(scan_id, results):
+    """Save agent results to Supabase results table."""
+    rows = []
+    for item in results:
+        rows.append({
+            "scan_id": scan_id,
+            "attack_id": item.get("id", ""),
+            "category": item.get("category", ""),
+            "payload": item.get("payload", ""),
+            "target_response": item.get("target_response", ""),
+            "verdict": item.get("verdict", "FAIL"),
+            "reason": item.get("reason", "")
+        })
+    supabase.table("results").insert(rows).execute()
+
+def _load_results_from_db(scan_id):
+    """Load results from Supabase for a given scan_id."""
+    response = supabase.table("results")\
+        .select("*")\
+        .eq("scan_id", scan_id)\
+        .execute()
+    return response.data or []
+
+def _create_scan(target_url):
+    """Create a new scan record in Supabase and return its id."""
+    response = supabase.table("scans").insert({
+        "target_url": target_url,
+        "status": "running"
+    }).execute()
+    return response.data[0]["id"]
+
+def _complete_scan(scan_id):
+    """Mark a scan as completed in Supabase."""
+    from datetime import datetime, timezone
+    supabase.table("scans").update({
+        "status": "completed",
+        "completed_at": datetime.now(timezone.utc).isoformat()
+    }).eq("id", scan_id).execute()
+
 # ---------------------------------------------------------------------------
 # Routes
 # ---------------------------------------------------------------------------
@@ -59,47 +99,52 @@ def scan():
     """
     if request.method == "POST":
         data = request.get_json(silent=True) or {}
-        target_url = data.get("target_url")
+        target_url = data.get("target_url", "http://localhost:5000/chat")
         
-        # Check current results to see if they're "good" before we overwrite them
+        # Create scan record in Supabase
+        scan_id = _create_scan(target_url)
+        
+        # Back up current good results before overwriting
         current_results, current_error = _load_results()
         if not current_error and current_results:
-            is_good = False
-            for r in current_results:
-                reason = r.get("reason", "").lower()
-                if "classifier api error" not in reason and "quota" not in reason and "timed out" not in reason:
-                    is_good = True
-                    break
+            is_good = any(
+                "classifier api error" not in r.get("reason", "").lower() and
+                "quota" not in r.get("reason", "").lower()
+                for r in current_results
+            )
             if is_good:
                 import shutil
-                last_good_path = os.path.join(_PROJECT_ROOT, "results_last_good.json")
-                shutil.copy2(RESULTS_PATH, last_good_path)
-
+                shutil.copy2(RESULTS_PATH, os.path.join(_PROJECT_ROOT, "results_last_good.json"))
+        
         try:
             agent_module.run_evaluation(target_url=target_url)
         except Exception as e:
             return jsonify({"status": "error", "message": f"Agent evaluation failed: {str(e)}"}), 500
+        
+        # Load fresh results from file and save to Supabase
+        results, error = _load_results()
+        if not error and results:
+            _save_results_to_db(scan_id, results)
+            _complete_scan(scan_id)
+        
+        # Store scan_id in a temp file so GET /scan can retrieve it
+        scan_id_path = os.path.join(_PROJECT_ROOT, "last_scan_id.txt")
+        with open(scan_id_path, "w") as f:
+            f.write(scan_id)
 
-    results, error = _load_results()
-    if error:
-        return jsonify({"status": "error", "message": error}), 404
+    # Try loading from Supabase first
+    scan_id_path = os.path.join(_PROJECT_ROOT, "last_scan_id.txt")
+    results = []
+    if os.path.isfile(scan_id_path):
+        with open(scan_id_path, "r") as f:
+            last_scan_id = f.read().strip()
+        results = _load_results_from_db(last_scan_id)
 
-    # Check if the loaded results entirely failed due to API limits (applies to GET and POST)
-    all_failed = True if results else False
-    for r in (results or []):
-        reason = r.get("reason", "").lower()
-        if "classifier api error" not in reason and "quota" not in reason and "timed out" not in reason:
-            all_failed = False
-            break
-    
-    if all_failed:
-        last_good_path = os.path.join(_PROJECT_ROOT, "results_last_good.json")
-        if os.path.isfile(last_good_path):
-            try:
-                with open(last_good_path, "r", encoding="utf-8") as fh:
-                    results = json.load(fh)
-            except:
-                pass
+    # Fall back to results.json if Supabase returns nothing
+    if not results:
+        results, error = _load_results()
+        if error:
+            return jsonify({"status": "error", "message": error}), 404
 
     transformed_results = []
     for item in results:
