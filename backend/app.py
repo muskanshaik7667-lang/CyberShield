@@ -89,7 +89,35 @@ def _complete_scan(scan_id):
 # ---------------------------------------------------------------------------
 # Routes
 # ---------------------------------------------------------------------------
+from functools import wraps
+import jwt
+
+def require_auth(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        auth_header = request.headers.get("Authorization", "")
+        if not auth_header.startswith("Bearer "):
+            return jsonify({"error": "Missing authorization token"}), 401
+        token = auth_header.split(" ")[1]
+        try:
+            # Verify JWT using Supabase JWT secret
+            jwt_secret = os.environ.get("SUPABASE_JWT_SECRET", "")
+            decoded = jwt.decode(
+                token,
+                jwt_secret,
+                algorithms=["HS256"],
+                options={"verify_aud": False}
+            )
+            request.user_id = decoded.get("sub")
+        except jwt.ExpiredSignatureError:
+            return jsonify({"error": "Token expired"}), 401
+        except jwt.InvalidTokenError:
+            return jsonify({"error": "Invalid token"}), 401
+        return f(*args, **kwargs)
+    return decorated
+
 @app.route("/scan", methods=["GET", "POST"])
+@require_auth
 def scan():
     """
     Trigger a scan — reads results.json from the project root, transforms
@@ -162,6 +190,7 @@ def scan():
 
 
 @app.route("/report", methods=["GET"])
+@require_auth
 def report():
     """
     Return the summary report object directly: total, pass_count, fail_count,

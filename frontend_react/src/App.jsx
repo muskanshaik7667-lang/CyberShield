@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { supabase } from './supabaseClient'
 
 // --- DYNAMIC CUSTOM CURSOR & PARTICLES TRAIL ---
 if (window.matchMedia('(pointer: fine)').matches) {
@@ -544,7 +545,7 @@ const MOCK_SCAN_RESULTS = [
 ];
 
 // --- MAIN REACT APPLICATION COMPONENT ---
-const App = () => {
+const App = (props) => {
     const [activeTab, setActiveTab] = useState('home');
     const [isScanning, setIsScanning] = useState(false);
     const [scanCount, setScanCount] = useState(0);
@@ -593,7 +594,11 @@ const App = () => {
         // 1. Fetch scan endpoint
         try {
             console.log("Contacting backend at http://localhost:5001/scan ...");
-            const scanRes = await fetch('http://localhost:5001/scan');
+            const scanRes = await fetch('http://localhost:5001/scan', {
+              headers: {
+                'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
+              }
+            });
             if (!scanRes.ok) throw new Error("Backend response error");
             const scanData = await scanRes.json();
             setScanResults(scanData);
@@ -613,7 +618,11 @@ const App = () => {
         // 2. Fetch report endpoint
         try {
             console.log("Contacting backend at http://localhost:5001/report ...");
-            const reportRes = await fetch('http://localhost:5001/report');
+            const reportRes = await fetch('http://localhost:5001/report', {
+              headers: {
+                'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
+              }
+            });
             if (!reportRes.ok) throw new Error("Backend response error");
             const reportData = await reportRes.json();
             setReport(reportData);
@@ -806,6 +815,31 @@ const App = () => {
 
     return (
         <div className="flex flex-col min-h-screen">
+            <div style={{
+              position: 'fixed',
+              top: '16px',
+              right: '16px',
+              zIndex: 1000
+            }}>
+              <button
+                onClick={async () => {
+                  await import('./supabaseClient').then(({ supabase }) => supabase.auth.signOut())
+                  if (props.onSignOut) props.onSignOut()
+                }}
+                style={{
+                  backgroundColor: 'transparent',
+                  border: '1px solid #c9a961',
+                  color: '#c9a961',
+                  padding: '6px 14px',
+                  borderRadius: '6px',
+                  fontFamily: 'DM Sans, sans-serif',
+                  fontSize: '12px',
+                  cursor: 'pointer'
+                }}
+              >
+                Sign Out
+              </button>
+            </div>
             
             {/* GLASSMORPHIC NAVBAR */}
             <nav className={`fixed top-0 left-0 w-full z-40 transition-all duration-300 border-b border-white/5 ${scrolled ? 'scrolled-nav' : 'bg-transparent py-4'}`}>

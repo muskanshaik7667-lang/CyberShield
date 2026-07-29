@@ -48,9 +48,8 @@ def run_evaluation(target_url=None):
     target_url = target_url or TARGET_APP_URL
     agent_dir = os.path.dirname(os.path.abspath(__file__))
     library_path = os.path.join(agent_dir, "attack_library.json")
-    
     with open(library_path, "r", encoding="utf-8") as f:
-        attacks = json.load(f)[:2]
+        attacks = json.load(f)[:5]
 
     results = []
     print(f"Loaded {len(attacks)} attacks from attack_library.json. Starting red-team evaluation against {target_url}...")
