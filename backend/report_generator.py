@@ -21,10 +21,10 @@ from typing import Any
 def _compute_severity(pass_rate: float) -> str:
     """Return severity label ("Low", "Medium", or "Critical") based on pass_rate."""
     if pass_rate > 80:
-        return "Low"
+        return "Critical"
     if pass_rate > 60:
         return "Medium"
-    return "Critical"
+    return "Low"
 
 
 def generate_report(results: list[dict[str, Any]]) -> dict[str, Any]:
