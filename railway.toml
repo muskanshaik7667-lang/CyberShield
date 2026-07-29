@@ -1,0 +1,9 @@
+[build]
+builder = "nixpacks"
+
+[build.nixpacksPlan.phases.setup]
+nixPkgs = ["python311"]
+
+[deploy]
+startCommand = "cd backend && gunicorn app:app"
+restartPolicyType = "ON_FAILURE"
