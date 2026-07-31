@@ -459,7 +459,7 @@ const CyberShield3D = () => {
             {/* Ambient circular details */}
             <div className="absolute w-[360px] h-[360px] border border-cyber-primary/10 rounded-full animate-[spin_40s_linear_infinite] pointer-events-none"></div>
             <div className="absolute w-[420px] h-[420px] border border-dashed border-cyber-secondary/10 rounded-full animate-[spin_60s_linear_infinite_reverse] pointer-events-none"></div>
-            <div ref={containerRef} id="shield-canvas" className="w-full h-full"></div>
+            <div ref={containerRef} id="shield-canvas" className="w-full h-full" style={{height: '400px', overflow: 'hidden', backgroundColor: '#0b0a08'}}></div>
         </div>
     );
 };
@@ -832,7 +832,7 @@ const App = (props) => {
     };
 
     return (
-        <div className="flex flex-col min-h-screen">
+        <div className="flex flex-col min-h-screen" style={{backgroundColor: '#0b0a08', color: '#ffffff'}}>
             <div style={{
               position: 'fixed',
               top: '16px',
