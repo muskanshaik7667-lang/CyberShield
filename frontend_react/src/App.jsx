@@ -187,6 +187,15 @@ const CyberShield3D = () => {
         const scene = new THREE.Scene();
         sceneRef.current = scene;
 
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+        scene.add(ambientLight);
+        const pointLight = new THREE.PointLight(0x8B5CF6, 2, 20);
+        pointLight.position.set(3, 3, 3);
+        scene.add(pointLight);
+        const pointLight2 = new THREE.PointLight(0x00E5FF, 1.5, 20);
+        pointLight2.position.set(-3, -2, 2);
+        scene.add(pointLight2);
+
         const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
         camera.position.z = 7;
 
