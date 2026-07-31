@@ -316,19 +316,6 @@ const CyberShield3D = () => {
             ring2.add(tick);
         }
 
-        // 5. Lights setup
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.45);
-        scene.add(ambientLight);
-
-        const pointCyan = new THREE.PointLight(0x00E5FF, 1.8, 15);
-        pointCyan.position.set(-3, 3, 3);
-        scene.add(pointCyan);
-        lightsRef.current.push(pointCyan);
-
-        const pointPurple = new THREE.PointLight(0x8B5CF6, 1.8, 15);
-        pointPurple.position.set(3, -3, 3);
-        scene.add(pointPurple);
-        lightsRef.current.push(pointPurple);
 
         // --- INTERACTION LOGIC (MOUSE TILT, CUSTOM HOVERS/CLICKS) ---
         let mouse = { x: 0, y: 0 };
