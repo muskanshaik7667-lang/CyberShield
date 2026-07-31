@@ -1,3 +1,13 @@
+*, *::before, *::after { box-sizing: border-box; }
+html, body, #root {
+  background-color: #0b0a08;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  color: #ffffff;
+  font-family: 'DM Sans', sans-serif;
+}
+
 /* Cyber Grid Pattern Background */
 .cyber-grid {
     background-image: 
