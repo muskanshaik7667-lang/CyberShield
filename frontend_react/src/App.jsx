@@ -593,8 +593,8 @@ const App = (props) => {
 
         // 1. Fetch scan endpoint
         try {
-            console.log("Contacting backend at http://localhost:5001/scan ...");
-            const scanRes = await fetch('http://localhost:5001/scan', {
+            console.log("Contacting backend at https://cybershield-production-2c38.up.railway.app/scan ...");
+            const scanRes = await fetch('https://cybershield-production-2c38.up.railway.app/scan', {
               headers: {
                 'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
               }
@@ -617,8 +617,8 @@ const App = (props) => {
 
         // 2. Fetch report endpoint
         try {
-            console.log("Contacting backend at http://localhost:5001/report ...");
-            const reportRes = await fetch('http://localhost:5001/report', {
+            console.log("Contacting backend at https://cybershield-production-2c38.up.railway.app/report ...");
+            const reportRes = await fetch('https://cybershield-production-2c38.up.railway.app/report', {
               headers: {
                 'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`
               }
