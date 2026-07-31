@@ -1,6 +1,6 @@
 *, *::before, *::after { box-sizing: border-box; }
 html, body, #root {
-  background-color: #0b0a08;
+  background-color: #0b0a08 !important;
   min-height: 100vh;
   margin: 0;
   padding: 0;

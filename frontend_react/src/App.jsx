@@ -202,6 +202,15 @@ const CyberShield3D = () => {
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(width, height);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setClearColor(0x000000, 0);
+        renderer.domElement.style.position = 'absolute';
+        renderer.domElement.style.top = '0';
+        renderer.domElement.style.left = '0';
+        renderer.domElement.style.pointerEvents = 'none';
+        renderer.domElement.style.zIndex = '0';
+
+        containerRef.current.style.position = 'relative';
+        containerRef.current.style.background = '#0b0a08';
         containerRef.current.appendChild(renderer.domElement);
         rendererRef.current = renderer;
 
