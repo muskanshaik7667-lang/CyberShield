@@ -446,7 +446,45 @@ const CyberShield3D = () => {
             {/* Ambient circular details */}
             <div className="absolute w-[360px] h-[360px] border border-cyber-primary/10 rounded-full animate-[spin_40s_linear_infinite] pointer-events-none"></div>
             <div className="absolute w-[420px] h-[420px] border border-dashed border-cyber-secondary/10 rounded-full animate-[spin_60s_linear_infinite_reverse] pointer-events-none"></div>
-            <div ref={containerRef} id="shield-canvas" className="w-full h-full" style={{display: 'none'}}></div>
+            <div style={{
+              width: '100%',
+              minHeight: '60vh',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'linear-gradient(135deg, #0b0a08 0%, #0d1117 50%, #0b0a08 100%)',
+              position: 'relative',
+              overflow: 'hidden'
+            }}>
+              <div style={{
+                width: '120px',
+                height: '120px',
+                border: '2px solid #c9a961',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: '24px',
+                boxShadow: '0 0 40px rgba(201, 169, 97, 0.3)'
+              }}>
+                <span style={{fontSize: '48px'}}>🛡️</span>
+              </div>
+              <h1 style={{
+                fontFamily: 'Cormorant Garamond, serif',
+                color: '#c9a961',
+                fontSize: '48px',
+                margin: '0 0 12px 0',
+                letterSpacing: '4px'
+              }}>VIGIL AI</h1>
+              <p style={{
+                color: '#888',
+                fontFamily: 'DM Sans, sans-serif',
+                fontSize: '14px',
+                letterSpacing: '2px',
+                textTransform: 'uppercase'
+              }}>Autonomous Red-Teaming Agent</p>
+            </div>
         </div>
     );
 };
