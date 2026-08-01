@@ -1012,7 +1012,7 @@ const App = (props) => {
                                 onMouseLeave={triggerShieldHoverOff}
                             >
                                 <div className="absolute w-[450px] h-[450px] bg-cyber-primary/2 rounded-full blur-[100px] pointer-events-none"></div>
-                                <CyberShield3D />
+                                {false && <CyberShield3D />}
                             </div>
                         </div>
 
