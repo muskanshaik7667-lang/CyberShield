@@ -187,7 +187,7 @@ const CyberShield3D = () => {
         const scene = new THREE.Scene();
         sceneRef.current = scene;
 
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 1.5);
         scene.add(ambientLight);
         const pointLight = new THREE.PointLight(0x8B5CF6, 2, 20);
         pointLight.position.set(3, 3, 3);
@@ -240,8 +240,8 @@ const CyberShield3D = () => {
 
         const shieldMaterial = new THREE.MeshStandardMaterial({
             color: 0x071426,
-            roughness: 0.15,
-            metalness: 0.95,
+            roughness: 0.6,
+            metalness: 0.3,
             transparent: true,
             opacity: 0.85,
             side: THREE.DoubleSide
@@ -270,7 +270,7 @@ const CyberShield3D = () => {
             emissive: 0x8B5CF6,
             emissiveIntensity: 1.0,
             roughness: 0.2,
-            metalness: 0.8
+            metalness: 0.3
         });
         const lockBody = new THREE.Mesh(lockBodyGeo, lockBodyMat);
         lockBody.position.y = -0.15;
@@ -281,7 +281,7 @@ const CyberShield3D = () => {
         const shackleGeo = new THREE.TorusGeometry(0.22, 0.05, 8, 24, Math.PI);
         const shackleMat = new THREE.MeshStandardMaterial({ 
             color: 0x8B5CF6, 
-            metalness: 0.9, 
+            metalness: 0.3, 
             roughness: 0.1 
         });
         const shackle = new THREE.Mesh(shackleGeo, shackleMat);
