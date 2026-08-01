@@ -442,7 +442,7 @@ const CyberShield3D = () => {
     }, []);
 
     return (
-        <div className="shield-canvas-wrapper select-none">
+        <div className="shield-canvas-wrapper select-none" style={{display: 'none'}}>
             {/* Ambient circular details */}
             <div className="absolute w-[360px] h-[360px] border border-cyber-primary/10 rounded-full animate-[spin_40s_linear_infinite] pointer-events-none"></div>
             <div className="absolute w-[420px] h-[420px] border border-dashed border-cyber-secondary/10 rounded-full animate-[spin_60s_linear_infinite_reverse] pointer-events-none"></div>
